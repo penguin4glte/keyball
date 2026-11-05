@@ -17,7 +17,12 @@ on:
         description: 'Keymap'
         required: true
         type: string
-        default: 'default'
+        default: 'penguin4glte'
+      qmk_version:
+        description: 'QMK version (tag)'
+        required: true
+        type: string
+        default: '0.33.8'
 
 jobs:
 
@@ -25,6 +30,6 @@ jobs:
 
     uses: ./.github/workflows/build-firmware.yml
     with:
-      qmk_version: '0.22.14'
+      qmk_version: ${{ inputs.qmk_version }}
       keyboard:    ${{ inputs.keyboard }}
       keymap:      ${{ inputs.keymap }}
