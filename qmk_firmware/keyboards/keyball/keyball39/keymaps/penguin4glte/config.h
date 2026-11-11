@@ -36,12 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TAP_CODE_DELAY 5
 
 // QMK標準のAuto Mouse Layerは使わず、keymap.c で独自実装する
-// (negokaz方式: マウスキーを押すまでマウスレイヤーに留まり、クリック後に短時間で抜ける)
+// (時間やクリックで抜けると、止まってから押したクリックがレイヤー0の文字になるため)
 // #define POINTING_DEVICE_AUTO_MOUSE_ENABLE
 
 // レイヤー4をマウス専用レイヤーとして追加するため、VIAのレイヤー数を5にする
 #define DYNAMIC_KEYMAP_LAYER_COUNT 5
-
-// クリック(マウスボタンを離して)から何ms後にマウスレイヤーを抜けるか
-// AML_I50 / AML_D50 キーで実行中に±50msできる(電源を切ると戻る)
-#define AML_CLICK_EXIT_MS_DEFAULT 300

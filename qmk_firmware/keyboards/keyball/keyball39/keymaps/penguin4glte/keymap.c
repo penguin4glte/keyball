@@ -49,7 +49,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
   [3] = LAYOUT_universal(
-    RGB_TOG  , AML_TO   , AML_I50  , AML_D50  , _______  ,                            _______  , _______  , SSNP_HOR , SSNP_VRT , SSNP_FRE ,
+    RGB_TOG  , AML_TO   , _______  , _______  , _______  ,                            _______  , _______  , SSNP_HOR , SSNP_VRT , SSNP_FRE ,
     RGB_MOD  , RGB_HUI  , RGB_SAI  , RGB_VAI  , SCRL_DVI ,                            _______  , _______  , _______  , _______  , _______  ,
     RGB_RMOD , RGB_HUD  , RGB_SAD  , RGB_VAD  , SCRL_DVD ,                            CPI_D1K  , CPI_D100 , CPI_I100 , CPI_I1K  , KBC_SAVE ,
     QK_BOOT  , KBC_RST  , _______  , _______  , _______  , _______  ,      _______  , _______  , _______  , _______  , KBC_RST  , QK_BOOT
@@ -73,40 +73,28 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // 参考: negokaz/keyball PR#2「マウスキーを押すまで Auto Mouse Layer に留まり誤爆を減らす」
 //       魚住惇「Keyball39の自動マウスレイヤーで、如何に誤爆を少なくするか」
 //
-// 1. レイヤー0でボールを転がすとマウスレイヤー(4)に入る。時間経過では抜けない。
-// 2. マウスボタンを押して離すと、AML_CLICK_EXIT_MS_DEFAULT 後に抜ける。
-//    その間にボールを動かす/もう一度クリックすれば留まる(ダブルクリック・ドラッグ対応)。
-// 3. マウスレイヤーで _______ (=レイヤー0のキー) を押したら即座に抜け、そのキーとして働く。
+// 1. レイヤー0でボールを転がすとマウスレイヤー(4)に入る。時間経過でもクリックでも抜けない。
+//    (クリック後に時間で抜ける方式だと、止まってから再クリックしたときにレイヤー0の j が入力される)
+// 2. マウスレイヤーで _______ (=レイヤー0のキー) を押したら即座に抜け、そのキーとして働く。
 //    - 左親指 LNG2 タップ → IMEオフでレイヤー0 / LNG1 タップ → IMEオンでレイヤー0
 //    - Space タップ → スペースを打ってレイヤー0
 //    - LT(1)/LT(2) ホールド → そのレイヤーに入り、離すとレイヤー0に戻る(AMLには戻らない)
-// 4. 次の場合はマウスレイヤーに留まる(マウス操作の補助なので)。
+// 3. 次の場合はマウスレイヤーに留まる(マウス操作の補助なので)。
 //    - Ctrl/Cmd/Alt などの修飾キー、Shift(LSFT_T)のホールド … Cmd+クリックなど
 //    - LT(3) のホールド … スクロールモード
 //////////////////////////////////////////////////////////////////////////////
 
-static bool     aml_enabled       = true;
-static bool     aml_active        = false;
-static bool     aml_exit_pending  = false;
-static uint16_t aml_exit_timer    = 0;
-static uint16_t aml_click_exit_ms = AML_CLICK_EXIT_MS_DEFAULT;
-static uint8_t  aml_buttons_held  = 0;
+static bool aml_enabled = true;
+static bool aml_active  = false;
 
 static void aml_enter(void) {
-    aml_active       = true;
-    aml_exit_pending = false;
+    aml_active = true;
     layer_on(MOUSE_LAYER);
 }
 
 static void aml_exit(void) {
-    aml_active       = false;
-    aml_exit_pending = false;
-    aml_buttons_held = 0;
+    aml_active = false;
     layer_off(MOUSE_LAYER);
-}
-
-static bool is_mouse_button(uint16_t keycode) {
-    return keycode >= KC_MS_BTN1 && keycode <= KC_MS_BTN8;
 }
 
 // マウスレイヤーに留まったまま使ってよいキーか
@@ -135,66 +123,25 @@ static bool aml_keeps_layer(uint16_t keycode, keyrecord_t *record) {
 }
 
 report_mouse_t pointing_device_task_user(report_mouse_t report) {
-    if (report.x != 0 || report.y != 0) {
-        if (aml_active) {
-            // クリック後に動かしたら、まだマウスとして使う
-            aml_exit_pending = false;
-        } else if (aml_enabled && get_highest_layer(layer_state) == 0 && !keyball_get_scroll_mode()) {
-            aml_enter();
-        }
+    if ((report.x != 0 || report.y != 0) && !aml_active && aml_enabled && get_highest_layer(layer_state) == 0 && !keyball_get_scroll_mode()) {
+        aml_enter();
     }
     return report;
 }
 
-void matrix_scan_user(void) {
-    if (aml_active && aml_exit_pending && aml_buttons_held == 0 && timer_elapsed(aml_exit_timer) >= aml_click_exit_ms) {
-        aml_exit();
-    }
-}
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        // QMK標準AMLの代わりに独自AMLを操作する
-        case AML_TO:
-            if (record->event.pressed) {
-                aml_enabled = !aml_enabled;
-                if (!aml_enabled && aml_active) {
-                    aml_exit();
-                }
-            }
-            return false;
-        case AML_I50:
-            if (record->event.pressed && aml_click_exit_ms <= 1950) {
-                aml_click_exit_ms += 50;
-            }
-            return false;
-        case AML_D50:
-            if (record->event.pressed && aml_click_exit_ms >= 100) {
-                aml_click_exit_ms -= 50;
-            }
-            return false;
-    }
-
-    if (!aml_active) {
-        return true;
-    }
-
-    if (is_mouse_button(keycode)) {
+    // QMK標準AMLの代わりに独自AMLを操作する
+    if (keycode == AML_TO) {
         if (record->event.pressed) {
-            aml_buttons_held++;
-            aml_exit_pending = false;
-        } else {
-            if (aml_buttons_held > 0) {
-                aml_buttons_held--;
+            aml_enabled = !aml_enabled;
+            if (!aml_enabled && aml_active) {
+                aml_exit();
             }
-            // クリックしたら短時間でレイヤー0に戻る
-            aml_exit_pending = true;
-            aml_exit_timer   = timer_read();
         }
-        return true;
+        return false;
     }
 
-    if (record->event.pressed && !aml_keeps_layer(keycode, record)) {
+    if (aml_active && record->event.pressed && !aml_keeps_layer(keycode, record)) {
         // キーボードとして使い始めたので抜ける。キー自体はレイヤー0のキーとして処理される。
         aml_exit();
     }
@@ -206,8 +153,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     // (マウスレイヤーと同時にONになるので highest ではなく ON/OFF で判定)
     keyball_set_scroll_mode(layer_state_cmp(state, SCROLL_LAYER));
     if (!layer_state_cmp(state, MOUSE_LAYER)) {
-        aml_active       = false;
-        aml_exit_pending = false;
+        aml_active = false;
     }
     return state;
 }
