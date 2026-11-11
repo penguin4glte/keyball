@@ -29,7 +29,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // keymap for default (VIA)
   [0] = LAYOUT_universal(
     KC_Q     , KC_W     , KC_E     , KC_R     , KC_T     ,                            KC_Y     , KC_U     , KC_I     , KC_O     , KC_P     ,
-    KC_A     , KC_S     , KC_D     , KC_F     , KC_G     ,                            KC_H     , KC_J     , KC_K     , KC_L     , KC_MINS  ,
+    KC_A     , KC_S     , KC_D     , KC_F     , KC_G     ,                            KC_H     , KC_J     , KC_K     , KC_L     , KC_SCLN  ,
     KC_Z     , KC_X     , KC_C     , KC_V     , KC_B     ,                            KC_N     , KC_M     , KC_COMM  , KC_DOT   , KC_SLSH  ,
     KC_LCTL  , KC_LALT  , KC_LGUI  ,LT(3,KC_LNG2),LT(1,KC_SPC),LSFT_T(KC_LNG1),KC_BSPC,LT(2,KC_ENT),LSFT_T(KC_LNG2),KC_RGUI,KC_RALT, KC_ESC
   ),
@@ -37,8 +37,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // MacはKeyballをUS配列として認識するので、記号はUS配列のキーコードで書く
   [1] = LAYOUT_universal(
     KC_EXLM  , KC_AT    , KC_HASH  , KC_DLR   , KC_PERC  ,                            KC_CIRC  , KC_AMPR  , KC_ASTR  , KC_LPRN  , KC_RPRN  ,
-    KC_GRV   , KC_TILD  , KC_BSLS  , KC_PIPE  , KC_QUOT  ,                            KC_DQUO  , KC_LBRC  , KC_RBRC  , KC_SCLN  , KC_COLN  ,
-    KC_LT    , KC_GT    , KC_QUES  , _______  , _______  ,                            KC_UNDS  , KC_LCBR  , KC_RCBR  , KC_EQL   , KC_PLUS  ,
+    KC_GRV   , KC_TILD  , KC_LT    , KC_GT    , KC_QUES  ,                            KC_LEFT  , KC_DOWN  , KC_UP    , KC_RGHT  , KC_QUOT  ,
+    KC_UNDS  , KC_PLUS  , KC_LCBR  , KC_RCBR  , KC_PIPE  ,                            KC_MINS  , KC_EQL   , KC_LBRC  , KC_RBRC  , KC_BSLS  ,
     _______  , _______  , _______  , _______  , _______  , _______  ,      _______  , _______  , _______  , _______  , _______  , _______
   ),
 
