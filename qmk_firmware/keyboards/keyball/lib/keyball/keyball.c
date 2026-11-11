@@ -140,7 +140,7 @@ void keyboard_pre_init_kb(void) {
 }
 #endif
 
-bool pointing_device_driver_init(void) {
+void pointing_device_driver_init(void) {
 #if KEYBALL_MODEL != 46
     keyball.this_have_ball = pmw3360_init();
 #endif
@@ -156,10 +156,6 @@ bool pointing_device_driver_init(void) {
 #endif
         pmw3360_cpi_set(CPI_DEFAULT - 1);
     }
-    // ボールの無い側でも true を返す。false を返すと QMK 0.28 以降は
-    // pointing_device_task() 自体が止まり、反対側のボールの動きや
-    // マウスボタンが送られなくなる。
-    return true;
 }
 
 uint16_t pointing_device_driver_get_cpi(void) {
@@ -659,7 +655,7 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
 #ifndef MOUSEKEY_ENABLE
         // process KC_MS_BTN1~8 by myself
         // See process_action() in quantum/action.c for details.
-        case MS_BTN1 ... MS_BTN8: {
+        case KC_MS_BTN1 ... KC_MS_BTN8: {
             extern void register_mouse(uint8_t mouse_keycode, bool pressed);
             register_mouse(keycode, record->event.pressed);
             // to apply QK_MODS actions, allow to process others.
