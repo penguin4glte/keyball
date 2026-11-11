@@ -50,10 +50,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
   [3] = LAYOUT_universal(
-    KC_F1    , KC_F2    , KC_F3    , KC_F4    , AML_TO   ,                            _______  , _______  , SSNP_HOR , SSNP_VRT , SSNP_FRE ,
-    KC_F5    , KC_F6    , KC_F7    , KC_F8    , SCRL_DVI ,                            RGB_TOG  , RGB_MOD  , RGB_HUI  , RGB_SAI  , RGB_VAI  ,
-    KC_F9    , KC_F10   , KC_F11   , KC_F12   , SCRL_DVD ,                            CPI_D1K  , CPI_D100 , CPI_I100 , CPI_I1K  , KBC_SAVE ,
-    QK_BOOT  , KBC_RST  , _______  , _______  , _______  , _______  ,      _______  , _______  , _______  , _______  , KBC_RST  , QK_BOOT
+  G(KC_SPC) , KC_F1    , KC_F2    , KC_F3    , KC_F4    ,                            SCRL_DVI , SCRL_DVD , SSNP_HOR , SSNP_VRT , SSNP_FRE ,
+C(S(G(KC_4))), KC_F5    , KC_F6    , KC_F7    , KC_F8    ,                            RGB_TOG  , RGB_MOD  , RGB_HUI  , RGB_SAI  , RGB_VAI  ,
+ C(G(KC_Q)) , KC_F9    , KC_F10   , KC_F11   , KC_F12   ,                            CPI_D1K  , CPI_D100 , CPI_I100 , CPI_I1K  , KBC_SAVE ,
+    QK_BOOT  , KBC_RST  , _______  , _______  , _______  , _______  ,      _______  , _______  , AML_TO   , _______  , KBC_RST  , QK_BOOT
   ),
 
   // マウス専用レイヤー(ボールを転がすと自動で入る)
