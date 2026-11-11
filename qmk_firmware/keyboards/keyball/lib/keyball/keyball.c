@@ -156,7 +156,10 @@ bool pointing_device_driver_init(void) {
 #endif
         pmw3360_cpi_set(CPI_DEFAULT - 1);
     }
-    return keyball.this_have_ball;
+    // ボールの無い側でも true を返す。false を返すと QMK 0.28 以降は
+    // pointing_device_task() 自体が止まり、反対側のボールの動きや
+    // マウスボタンが送られなくなる。
+    return true;
 }
 
 uint16_t pointing_device_driver_get_cpi(void) {
